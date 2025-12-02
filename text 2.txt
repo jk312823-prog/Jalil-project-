@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jalil’s Project - اخراجات Tracker</title>
+<style>
+body { font-family: Arial; direction: rtl; padding:20px; background:#f7f7f7;}
+h1, h2 { text-align:center;}
+.balance{font-size:20px;margin-bottom:20px;text-align:center;}
+form{text-align:center;margin-bottom:20px;}
+input, select{margin:5px 0;padding:8px;}
+button{padding:8px 12px;}
+.table-wrapper{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th,td{border:1px solid #333;padding:8px;text-align:center;}
+@media only screen and (max-width:600px){
+input, select, button{width:100%;margin:5px 0;}
+table{font-size:14px;}
+}
+</style>
+</head>
+<body>
+<h1>Jalil’s Project - میرا روزانہ اخراجات Tracker</h1>
+<div class="balance">
+موجودہ بیلنس: <span id="balance">0</span> روپے
+</div>
+<form id="expenseForm">
+رقم: <input type="number" id="amount" required><br>
+ذرائع:
+<select id="source">
+<option value="Father">باپ</option>
+<option value="Bank">بینک</option>
+<option value="Cash">جیب</option>
+</select><br>
+تفصیل: <input type="text" id="notes"><br>
+<button type="submit">اضافہ کریں</button>
+</form>
+<h2>اخراجات کی فہرست</h2>
+<div class="table-wrapper">
+<table id="expenseTable">
+<tr><th>تاریخ</th><th>رقم</th><th>ذرائع</th><th>تفصیل</th></tr>
+</table>
+</div>
+<script>
+let expenses=JSON.parse(localStorage.getItem('expenses'))||[];
+let balance=parseFloat(localStorage.getItem('balance'))||0;
+const expenseForm=document.getElementById('expenseForm');
+const expenseTable=document.getElementById('expenseTable');
+const balanceDisplay=document.getElementById('balance');
+balanceDisplay.textContent=balance;
+function renderTable(){
+expenseTable.innerHTML=`<tr><th>تاریخ</th><th>رقم</th><th>ذرائع</th><th>تفصیل</th></tr>`;
+expenses.forEach(exp=>{
+const row=expenseTable.insertRow();
+row.insertCell(0).textContent=exp.date;
+row.insertCell(1).textContent=exp.amount;
+row.insertCell(2).textContent=exp.source;
+row.insertCell(3).textContent=exp.notes;
+});
+}
+renderTable();
+expenseForm.addEventListener('submit',function(e){
+e.preventDefault();
+const amount=parseFloat(document.getElementById('amount').value);
+const source=document.getElementById('source').value;
+const notes=document.getElementById('notes').value;
+const date=new Date().toLocaleDateString();
+balance-=amount;
+balanceDisplay.textContent=balance;
+const expense={date,amount,source,notes};
+expenses.push(expense);
+localStorage.setItem('expenses',JSON.stringify(expenses));
+localStorage.setItem('balance',balance);
+renderTable();
+expenseForm.reset();
+});
+</script>
+</body>
+</html>
